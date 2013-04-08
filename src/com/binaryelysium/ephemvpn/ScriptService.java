@@ -22,6 +22,14 @@
 
 package com.binaryelysium.ephemvpn;
 
+import com.binaryelysium.ephemvpn.config.GlobalConstants;
+import com.binaryelysium.ephemvpn.process.MyScriptProcess;
+import com.googlecode.android_scripting.AndroidProxy;
+import com.googlecode.android_scripting.ForegroundService;
+import com.googlecode.android_scripting.NotificationIdFactory;
+import com.googlecode.android_scripting.interpreter.InterpreterConfiguration;
+import com.googlecode.android_scripting.jsonrpc.RpcReceiverManager;
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -30,14 +38,6 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
-
-import com.binaryelysium.ephemvpn.config.GlobalConstants;
-import com.binaryelysium.ephemvpn.process.MyScriptProcess;
-import com.googlecode.android_scripting.AndroidProxy;
-import com.googlecode.android_scripting.ForegroundService;
-import com.googlecode.android_scripting.NotificationIdFactory;
-import com.googlecode.android_scripting.interpreter.InterpreterConfiguration;
-import com.googlecode.android_scripting.jsonrpc.RpcReceiverManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -179,16 +179,18 @@ public class ScriptService extends ForegroundService {
         // env var
         Map<String, String> environmentVariables = null;
         environmentVariables = new HashMap<String, String>();
-        environmentVariables.put("PYTHONPATH", Environment.getExternalStorageDirectory()
-                .getAbsolutePath()
-                + "/"
-                + this.getPackageName()
-                + "/extras/python"
-                + ":"
-                + this.getFilesDir().getAbsolutePath()
-                + "/python/lib/python2.7/lib-dynload"
-                + ":"
-                + this.getFilesDir().getAbsolutePath() + "/python/lib/python2.7");
+        environmentVariables.put("PYTHONPATH",
+                this.getFilesDir().getAbsolutePath() + "/libs"
+                        + ":"
+                        + Environment.getExternalStorageDirectory().getAbsolutePath()
+                        + "/"
+                        + this.getPackageName()
+                        + "/extras/python"
+                        + ":"
+                        + this.getFilesDir().getAbsolutePath()
+                        + "/python/lib/python2.7/lib-dynload"
+                        + ":"
+                        + this.getFilesDir().getAbsolutePath() + "/python/lib/python2.7");
         environmentVariables.put("TEMP", Environment.getExternalStorageDirectory()
                 .getAbsolutePath() + "/" + this.getPackageName() + "/extras/tmp");
         environmentVariables.put("PYTHONHOME", this.getFilesDir().getAbsolutePath() + "/python");

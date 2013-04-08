@@ -22,6 +22,12 @@
 
 package com.binaryelysium.ephemvpn;
 
+import com.binaryelysium.ephemvpn.config.GlobalConstants;
+import com.binaryelysium.ephemvpn.process.MyScriptProcess;
+import com.googlecode.android_scripting.AndroidProxy;
+import com.googlecode.android_scripting.interpreter.InterpreterConfiguration;
+import com.googlecode.android_scripting.jsonrpc.RpcReceiverManager;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -29,12 +35,6 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
-
-import com.binaryelysium.ephemvpn.config.GlobalConstants;
-import com.binaryelysium.ephemvpn.process.MyScriptProcess;
-import com.googlecode.android_scripting.AndroidProxy;
-import com.googlecode.android_scripting.interpreter.InterpreterConfiguration;
-import com.googlecode.android_scripting.jsonrpc.RpcReceiverManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ public class BackgroundScriptService extends Service {
 
     private boolean killMe;
 
-    private InterpreterConfiguration mInterpreterConfiguration = null;
+    private final InterpreterConfiguration mInterpreterConfiguration = null;
 
     private RpcReceiverManager mFacadeManager;
 
@@ -167,7 +167,6 @@ public class BackgroundScriptService extends Service {
         // arguments
         ArrayList<String> args = new ArrayList<String>();
         args.add(scriptName);
-        args.add("--foreground");
 
         File pythonBinary = new File(this.getFilesDir().getAbsolutePath() + "/python/bin/python");
 
@@ -190,6 +189,8 @@ public class BackgroundScriptService extends Service {
         environmentVariables.put("LD_LIBRARY_PATH", this.getFilesDir().getAbsolutePath()
                 + "/python/lib" + ":" + this.getFilesDir().getAbsolutePath()
                 + "/python/lib/python2.7/lib-dynload");
+        environmentVariables.put("HOME", this.getFilesDir().getAbsolutePath());
+
 
         // launch script
         mProxy = new AndroidProxy(this, null, true);
@@ -198,21 +199,21 @@ public class BackgroundScriptService extends Service {
 
         myScriptProcess = MyScriptProcess.launchScript(script, mInterpreterConfiguration, mProxy,
                 new Runnable() {
-                    @Override
-                    public void run() {
-                        mProxy.shutdown();
-                        stopSelf(startId);
-                        killProcess();
-                        android.os.Process.killProcess(android.os.Process.myPid());
+            @Override
+            public void run() {
+                mProxy.shutdown();
+                stopSelf(startId);
+                killProcess();
+                android.os.Process.killProcess(android.os.Process.myPid());
 
-                        // hard force restart
-                        // if (!ScriptService.this.killMe) {
-                        // startMyMain();
-                        // }
+                // hard force restart
+                // if (!ScriptService.this.killMe) {
+                // startMyMain();
+                // }
 
-                    }
-                }, script.getParent(), Environment.getExternalStorageDirectory().getAbsolutePath()
-                        + "/" + this.getPackageName(), args, environmentVariables, pythonBinary);
+            }
+        }, script.getParent(), Environment.getExternalStorageDirectory().getAbsolutePath()
+        + "/" + this.getPackageName(), args, environmentVariables, pythonBinary);
     }
 
     // ------------------------------------------------------------------------------------------------------
@@ -221,7 +222,7 @@ public class BackgroundScriptService extends Service {
         mLatch.await();
 
         if (mFacadeManager == null) { // Facade manage may not be available on
-                                      // startup.
+            // startup.
             mFacadeManager = mProxy.getRpcReceiverManagerFactory().getRpcReceiverManagers().get(0);
         }
         return mFacadeManager;

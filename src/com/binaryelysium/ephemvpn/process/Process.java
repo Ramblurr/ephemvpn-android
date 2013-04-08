@@ -22,18 +22,21 @@
 
 package com.binaryelysium.ephemvpn.process;
 
-import android.util.Log;
-
+import com.binaryelysium.ephemvpn.StreamGobbler;
+import com.binaryelysium.ephemvpn.StreamGobbler.StreamUpdate;
 import com.binaryelysium.ephemvpn.config.GlobalConstants;
 import com.googlecode.android_scripting.Exec;
-import com.trilead.ssh2.StreamGobbler;
 
+import android.util.Log;
+
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +68,7 @@ public class Process {
 
     protected OutputStream mOut;
 
-    protected InputStream mIn;
+    protected StreamGobbler mIn;
 
     protected File mLog;
 
@@ -125,8 +128,24 @@ public class Process {
         return mLog;
     }
 
-    public InputStream getIn() {
-        return mIn;
+    public class FileStreamUpdate extends StreamUpdate {
+        BufferedWriter os;
+        public FileStreamUpdate(File file) throws IOException {
+            this.os = new BufferedWriter(new FileWriter(file));
+
+        }
+        @Override
+        public void update(String val) {
+            try {
+                os.write(val);
+                Log.d("EPHVPN", val);
+                os.flush();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
     }
 
     public void start(final Runnable shutdownHook) {
@@ -142,35 +161,40 @@ public class Process {
         String[] argumentsArray = mArguments.toArray(new String[mArguments.size()]);
 
         mLog = new File(String.format("%s/%s.log", getSdcardPackageDirectory() + "/", getName()));
+        Log.d("EPHEM", mLog.getAbsolutePath());
         mFd = Exec.createSubprocess(binaryPath, argumentsArray, getEnvironmentArray(),
                 getWorkingDirectory(), pid);
         mPid.set(pid[0]);
         mOut = new FileOutputStream(mFd);
-        mIn = new StreamGobbler(new FileInputStream(mFd), mLog, DEFAULT_BUFFER_SIZE);
-        mStartTime = System.currentTimeMillis();
+        try {
+            mIn = new StreamGobbler( new FileInputStream(mFd), new FileStreamUpdate(mLog));
+            mStartTime = System.currentTimeMillis();
 
-        new Thread(new Runnable() {
-            public void run() {
-                returnValue = Exec.waitFor(mPid.get());
-                mEndTime = System.currentTimeMillis();
-                int pid = mPid.getAndSet(PID_INIT_VALUE);
-                Log.d(GlobalConstants.LOG_TAG, "Process " + pid + " exited with result code "
-                        + returnValue + ".");
-                try {
-                    mIn.close();
-                } catch (IOException e) {
-                    Log.e(GlobalConstants.LOG_TAG, e.getMessage());
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    returnValue = Exec.waitFor(mPid.get());
+                    mEndTime = System.currentTimeMillis();
+                    int pid = mPid.getAndSet(PID_INIT_VALUE);
+                    Log.d(GlobalConstants.LOG_TAG, "Process " + pid + " exited with result code "
+                            + returnValue + ".");
+
+                    try {
+                        mOut.close();
+                    } catch (IOException e) {
+                        Log.e(GlobalConstants.LOG_TAG, e.getMessage());
+                    }
+                    if (shutdownHook != null) {
+                        shutdownHook.run();
+                    }
                 }
-                try {
-                    mOut.close();
-                } catch (IOException e) {
-                    Log.e(GlobalConstants.LOG_TAG, e.getMessage());
-                }
-                if (shutdownHook != null) {
-                    shutdownHook.run();
-                }
-            }
-        }).start();
+            }).start();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
 
     private String[] getEnvironmentArray() {
