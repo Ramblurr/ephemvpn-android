@@ -33,8 +33,8 @@ import android.os.IBinder;
 import com.binaryelysium.ephemvpn.config.GlobalConstants;
 import com.binaryelysium.ephemvpn.process.MyScriptProcess;
 import com.googlecode.android_scripting.AndroidProxy;
-import com.googlecode.android_scripting.jsonrpc.RpcReceiverManager;
 import com.googlecode.android_scripting.interpreter.InterpreterConfiguration;
+import com.googlecode.android_scripting.jsonrpc.RpcReceiverManager;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,170 +43,189 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 public class BackgroundScriptService extends Service {
-	private final CountDownLatch mLatch = new CountDownLatch(1);
-	private IBinder mBinder;
-	private MyScriptProcess myScriptProcess;
-	
-	private static BackgroundScriptService instance;
-	private boolean killMe;
-	  
-	private InterpreterConfiguration mInterpreterConfiguration = null;
-	private RpcReceiverManager mFacadeManager;
+    private final CountDownLatch mLatch = new CountDownLatch(1);
+
+    private IBinder mBinder;
+
+    private MyScriptProcess myScriptProcess;
+
+    private static BackgroundScriptService instance;
+
+    private boolean killMe;
+
+    private InterpreterConfiguration mInterpreterConfiguration = null;
+
+    private RpcReceiverManager mFacadeManager;
+
     private AndroidProxy mProxy;
-    
+
     private static Context context = null;
     static {
-      instance = null;
+        instance = null;
     }
-    
-    // ------------------------------------------------------------------------------------------------------
-
-	public class LocalBinder extends Binder {
-		public BackgroundScriptService getService() {
-			return BackgroundScriptService.this;
-		}
-	}
 
     // ------------------------------------------------------------------------------------------------------
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
+    public class LocalBinder extends Binder {
+        public BackgroundScriptService getService() {
+            return BackgroundScriptService.this;
+        }
+    }
 
     // ------------------------------------------------------------------------------------------------------
 
-//	public BackgroundScriptService() {
-//		mBinder = new LocalBinder();
-//	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 
     // ------------------------------------------------------------------------------------------------------
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return mBinder;
-	}
+    // public BackgroundScriptService() {
+    // mBinder = new LocalBinder();
+    // }
+
+    // ------------------------------------------------------------------------------------------------------
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
 
     // ------------------------------------------------------------------------------------------------------
 
     public static Context getAppContext() {
         return BackgroundScriptService.context;
     }
-    
-    // ------------------------------------------------------------------------------------------------------
-
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		BackgroundScriptService.context = getApplicationContext();
-		mBinder = new LocalBinder();
-	}
 
     // ------------------------------------------------------------------------------------------------------
 
-	private void killProcess() {
-		this.killMe = true;
-	    instance = null;
-	    if (myScriptProcess != null) {
-	    	myScriptProcess.kill();
-	    }
-	}
-
-    // ------------------------------------------------------------------------------------------------------
-	
-	@Override
-	public void onStart(Intent intent, final int startId) {
-		super.onStart(intent, startId);
-		
-		killProcess();
-		
-		instance = this;
-	    this.killMe = false;
-
-		new startMyAsyncTask().execute(startId);
-	}
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        BackgroundScriptService.context = getApplicationContext();
+        mBinder = new LocalBinder();
+    }
 
     // ------------------------------------------------------------------------------------------------------
 
-	  public class startMyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
-		   @Override
-		   protected void onPreExecute() {
-		   }
-	
-		   @Override
-		   protected Boolean doInBackground(Integer... params) {	    
-			   startMyMain(params[0]);
-			   
-			   // TODO
-			   return true;
-		   }
-	
-		   @Override
-		   protected void onProgressUpdate(Integer... values) {
-		   }
-	
-		   @Override
-		   protected void onPostExecute(Boolean installStatus) {
-		   }
-	   
-	  }
+    private void killProcess() {
+        this.killMe = true;
+        instance = null;
+        if (myScriptProcess != null) {
+            myScriptProcess.kill();
+        }
+    }
 
-	// ------------------------------------------------------------------------------------------------------
-
-	private void startMyMain(final int startId) {
-
-		String scriptName = GlobalConstants.PYTHON_MAIN_SCRIPT_NAME;
-		scriptName = this.getFilesDir().getAbsolutePath() + "/" + scriptName;
-		File script = new File(scriptName);
-		
-		// arguments
-		ArrayList<String> args = new ArrayList<String>();
-		args.add(scriptName);
-		args.add("--foreground");
-
-		File pythonBinary = new File(this.getFilesDir().getAbsolutePath() + "/python/bin/python");
-
-		// env var
-		Map<String, String> environmentVariables = null;	
-		environmentVariables = new HashMap<String, String>();
-		environmentVariables.put("PYTHONPATH", Environment.getExternalStorageDirectory().getAbsolutePath()+ "/" + this.getPackageName() + "/extras/python" + ":" + this.getFilesDir().getAbsolutePath() + "/python/lib/python2.7/lib-dynload" + ":" + this.getFilesDir().getAbsolutePath() + "/python/lib/python2.7");		
-		environmentVariables.put("TEMP", Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + this.getPackageName() + "/extras/tmp");		
-		environmentVariables.put("PYTHONHOME", this.getFilesDir().getAbsolutePath() + "/python");		
-		environmentVariables.put("LD_LIBRARY_PATH", this.getFilesDir().getAbsolutePath() + "/python/lib" + ":" + this.getFilesDir().getAbsolutePath() + "/python/lib/python2.7/lib-dynload");		
-		
-		// launch script
-		mProxy = new AndroidProxy(this, null, true);
-		mProxy.startLocal();
-		mLatch.countDown();
-	      
-		myScriptProcess = MyScriptProcess.launchScript(script, mInterpreterConfiguration, mProxy, new Runnable() {
-					@Override
-					public void run() {
-						mProxy.shutdown();
-						stopSelf(startId);
-						killProcess();
-						android.os.Process.killProcess(android.os.Process.myPid());
-						
-						// hard force restart
-//				        if (!ScriptService.this.killMe) {
-//				        	startMyMain();				        	
-//				        }
-
-					}
-				}, script.getParent(),  Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + this.getPackageName(), args, environmentVariables, pythonBinary);		
-	}
-	
     // ------------------------------------------------------------------------------------------------------
 
-	RpcReceiverManager getRpcReceiverManager() throws InterruptedException {
-		mLatch.await();
-		
-		if (mFacadeManager==null) { // Facade manage may not be available on startup.
-		mFacadeManager = mProxy.getRpcReceiverManagerFactory()
-		.getRpcReceiverManagers().get(0);
-		}
-		return mFacadeManager;
-	}
+    @Override
+    public void onStart(Intent intent, final int startId) {
+        super.onStart(intent, startId);
+
+        killProcess();
+
+        instance = this;
+        this.killMe = false;
+
+        new startMyAsyncTask().execute(startId);
+    }
+
+    // ------------------------------------------------------------------------------------------------------
+
+    public class startMyAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected Boolean doInBackground(Integer... params) {
+            startMyMain(params[0]);
+
+            // TODO
+            return true;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+        }
+
+        @Override
+        protected void onPostExecute(Boolean installStatus) {
+        }
+
+    }
+
+    // ------------------------------------------------------------------------------------------------------
+
+    private void startMyMain(final int startId) {
+
+        String scriptName = GlobalConstants.PYTHON_MAIN_SCRIPT_NAME;
+        scriptName = this.getFilesDir().getAbsolutePath() + "/" + scriptName;
+        File script = new File(scriptName);
+
+        // arguments
+        ArrayList<String> args = new ArrayList<String>();
+        args.add(scriptName);
+        args.add("--foreground");
+
+        File pythonBinary = new File(this.getFilesDir().getAbsolutePath() + "/python/bin/python");
+
+        // env var
+        Map<String, String> environmentVariables = null;
+        environmentVariables = new HashMap<String, String>();
+        environmentVariables.put("PYTHONPATH", Environment.getExternalStorageDirectory()
+                .getAbsolutePath()
+                + "/"
+                + this.getPackageName()
+                + "/extras/python"
+                + ":"
+                + this.getFilesDir().getAbsolutePath()
+                + "/python/lib/python2.7/lib-dynload"
+                + ":"
+                + this.getFilesDir().getAbsolutePath() + "/python/lib/python2.7");
+        environmentVariables.put("TEMP", Environment.getExternalStorageDirectory()
+                .getAbsolutePath() + "/" + this.getPackageName() + "/extras/tmp");
+        environmentVariables.put("PYTHONHOME", this.getFilesDir().getAbsolutePath() + "/python");
+        environmentVariables.put("LD_LIBRARY_PATH", this.getFilesDir().getAbsolutePath()
+                + "/python/lib" + ":" + this.getFilesDir().getAbsolutePath()
+                + "/python/lib/python2.7/lib-dynload");
+
+        // launch script
+        mProxy = new AndroidProxy(this, null, true);
+        mProxy.startLocal();
+        mLatch.countDown();
+
+        myScriptProcess = MyScriptProcess.launchScript(script, mInterpreterConfiguration, mProxy,
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        mProxy.shutdown();
+                        stopSelf(startId);
+                        killProcess();
+                        android.os.Process.killProcess(android.os.Process.myPid());
+
+                        // hard force restart
+                        // if (!ScriptService.this.killMe) {
+                        // startMyMain();
+                        // }
+
+                    }
+                }, script.getParent(), Environment.getExternalStorageDirectory().getAbsolutePath()
+                        + "/" + this.getPackageName(), args, environmentVariables, pythonBinary);
+    }
+
+    // ------------------------------------------------------------------------------------------------------
+
+    RpcReceiverManager getRpcReceiverManager() throws InterruptedException {
+        mLatch.await();
+
+        if (mFacadeManager == null) { // Facade manage may not be available on
+                                      // startup.
+            mFacadeManager = mProxy.getRpcReceiverManagerFactory().getRpcReceiverManagers().get(0);
+        }
+        return mFacadeManager;
+    }
 
     // ------------------------------------------------------------------------------------------------------
 }

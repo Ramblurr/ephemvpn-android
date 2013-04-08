@@ -29,56 +29,59 @@ import com.googlecode.android_scripting.interpreter.InterpreterConfiguration.Con
 
 public class ScriptApplication extends BaseApplication implements ConfigurationObserver {
 
-//  private volatile boolean receivedConfigUpdate = false;
-//  private final CountDownLatch mLatch = new CountDownLatch(1);
+    // private volatile boolean receivedConfigUpdate = false;
+    // private final CountDownLatch mLatch = new CountDownLatch(1);
 
-  private static Context context = null;
-  private static String thePackageName = null;
-  private static String theFilesDir = null;
+    private static Context context = null;
 
-  // ------------------------------------------------------------------------------------------------------
+    private static String thePackageName = null;
 
-  public static Context getAppContext() {
-      return ScriptApplication.context;
-  }
+    private static String theFilesDir = null;
 
-  public static String getThePackageName() {
-	  return thePackageName;
-  }
-	
-  public static String getTheFilesDir() {
-	  return theFilesDir;
-  }
+    // ------------------------------------------------------------------------------------------------------
 
-  // ------------------------------------------------------------------------------------------------------
+    public static Context getAppContext() {
+        return ScriptApplication.context;
+    }
 
-  @Override
-  public void onCreate() {
-//    mConfiguration = new InterpreterConfiguration(this);
-//    mConfiguration.registerObserver(this);
-//    mConfiguration.startDiscovering(InterpreterConstants.MIME + Utils.getFileExtension("foo.py"));
-		
-	  // dirty way to access some needed info in GlobalConstants
-	  ScriptApplication.context = getApplicationContext();
-	  ScriptApplication.theFilesDir = this.getFilesDir().getAbsolutePath();
-	  ScriptApplication.thePackageName = this.getPackageName();
-  } 
+    public static String getThePackageName() {
+        return thePackageName;
+    }
 
-@Override
-  public void onConfigurationChanged() {
-//	receivedConfigUpdate = true;
-//	mLatch.countDown();
-  }
+    public static String getTheFilesDir() {
+        return theFilesDir;
+    }
 
-//  public boolean readyToStart() {
-//
-//    try {
-//      mLatch.await();
-//    } catch (InterruptedException e) {
-//      e.printStackTrace();
-//    }
-//
-//    return receivedConfigUpdate;
-//  }
+    // ------------------------------------------------------------------------------------------------------
+
+    @Override
+    public void onCreate() {
+        // mConfiguration = new InterpreterConfiguration(this);
+        // mConfiguration.registerObserver(this);
+        // mConfiguration.startDiscovering(InterpreterConstants.MIME +
+        // Utils.getFileExtension("foo.py"));
+
+        // dirty way to access some needed info in GlobalConstants
+        ScriptApplication.context = getApplicationContext();
+        ScriptApplication.theFilesDir = this.getFilesDir().getAbsolutePath();
+        ScriptApplication.thePackageName = this.getPackageName();
+    }
+
+    @Override
+    public void onConfigurationChanged() {
+        // receivedConfigUpdate = true;
+        // mLatch.countDown();
+    }
+
+    // public boolean readyToStart() {
+    //
+    // try {
+    // mLatch.await();
+    // } catch (InterruptedException e) {
+    // e.printStackTrace();
+    // }
+    //
+    // return receivedConfigUpdate;
+    // }
 
 }

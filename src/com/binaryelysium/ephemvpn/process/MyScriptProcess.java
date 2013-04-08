@@ -22,7 +22,6 @@
 
 package com.binaryelysium.ephemvpn.process;
 
-import com.binaryelysium.ephemvpn.config.GlobalConstants;
 import com.googlecode.android_scripting.AndroidProxy;
 import com.googlecode.android_scripting.interpreter.InterpreterConfiguration;
 
@@ -32,46 +31,53 @@ import java.util.Map;
 
 public class MyScriptProcess extends PythonScriptProcess {
 
-	  private String workingDirectory;
-	  private String sdcardPackageDirectory;
+    private String workingDirectory;
 
-	  private MyScriptProcess(File paramFile, InterpreterConfiguration paramInterpreterConfiguration, AndroidProxy paramAndroidProxy, String workingDir, String sdcardPackageDirectory) {
-	    super(paramFile, paramInterpreterConfiguration, paramAndroidProxy);
-	    this.workingDirectory = workingDir;
-	    this.sdcardPackageDirectory = sdcardPackageDirectory;
-	  }
+    private String sdcardPackageDirectory;
 
-	  public static MyScriptProcess launchScript(File script, InterpreterConfiguration configuration, final AndroidProxy proxy, Runnable shutdownHook, String workingDir, String sdcardPackageDirectory, List<String> args, Map<String, String> envVars, File binary) {
-	    if (!script.exists()) {
-	        throw new RuntimeException("No such script to launch.");
-	      }
+    private MyScriptProcess(File paramFile, InterpreterConfiguration paramInterpreterConfiguration,
+            AndroidProxy paramAndroidProxy, String workingDir, String sdcardPackageDirectory) {
+        super(paramFile, paramInterpreterConfiguration, paramAndroidProxy);
+        this.workingDirectory = workingDir;
+        this.sdcardPackageDirectory = sdcardPackageDirectory;
+    }
 
-	    MyScriptProcess localScriptProcess = new MyScriptProcess(script, configuration, proxy, workingDir, sdcardPackageDirectory);
-    	localScriptProcess.putAllEnvironmentVariables(envVars); // set our python env var
-    	localScriptProcess.setBinary(binary);
-	    
-	    if (shutdownHook == null) {
-	    	localScriptProcess.start(new Runnable() {
-	          @Override
-	          public void run() {
-	            proxy.shutdown();
-	          }
-	        }, args);
-	      } else {
-	    	  localScriptProcess.start(shutdownHook, args);
-	      }
-	      return localScriptProcess;
-	    }
-	    
-	  @Override
-	  public String getWorkingDirectory() {
-	    return workingDirectory;
-	  }
+    public static MyScriptProcess launchScript(File script, InterpreterConfiguration configuration,
+            final AndroidProxy proxy, Runnable shutdownHook, String workingDir,
+            String sdcardPackageDirectory, List<String> args, Map<String, String> envVars,
+            File binary) {
+        if (!script.exists()) {
+            throw new RuntimeException("No such script to launch.");
+        }
 
-	  @Override
-	  public String getSdcardPackageDirectory() {
-	    return sdcardPackageDirectory;
-	  }
-	  
-	  
+        MyScriptProcess localScriptProcess = new MyScriptProcess(script, configuration, proxy,
+                workingDir, sdcardPackageDirectory);
+        localScriptProcess.putAllEnvironmentVariables(envVars); // set our
+                                                                // python env
+                                                                // var
+        localScriptProcess.setBinary(binary);
+
+        if (shutdownHook == null) {
+            localScriptProcess.start(new Runnable() {
+                @Override
+                public void run() {
+                    proxy.shutdown();
+                }
+            }, args);
+        } else {
+            localScriptProcess.start(shutdownHook, args);
+        }
+        return localScriptProcess;
+    }
+
+    @Override
+    public String getWorkingDirectory() {
+        return workingDirectory;
+    }
+
+    @Override
+    public String getSdcardPackageDirectory() {
+        return sdcardPackageDirectory;
+    }
+
 }
