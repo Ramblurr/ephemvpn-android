@@ -58,4 +58,8 @@ nosetests.xml
 
 external/ephemvpn-extras/
 external/ephemvpn_bundle.zip
+res/raw/ephemvpn_bundle.zip
 external/virtenv/
+
+lint.xml
+proguard-project.txt

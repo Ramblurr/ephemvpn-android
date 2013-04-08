@@ -6,7 +6,7 @@ PIP = $(VIRTENV)/bin/pip
 DESTDIR = $(EXTERNAL_ROOT)/ephemvpn-extras
 
 
-all: install-deps package zip
+all: install-deps package install
 
 ${VIRTENV}/bin/activate:
 	virtualenv --no-site-packages $(VIRTENV)
@@ -31,3 +31,6 @@ zip:
 
 distclean:
 	rm -rf $(DESTDIR) $(VIRTENV) ephemvpn_bundle.zip
+
+install: zip
+	cp -r ephemvpn_bundle.zip ../res/raw
