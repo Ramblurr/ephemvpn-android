@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="array_times">
+        <item>30 Minutes</item>
+        <item>2 Hours</item>
+        <item>4 Hours</item>
+        <item>8 Hours</item>
+        <item>12 Hours</item>
+        <item>1 Day</item>
+    </string-array>
+    <string-array name="array_times_values">
+        <item>30m</item>
+        <item>2h</item>
+        <item>4h</item>
+        <item>8h</item>
+        <item>12h</item>
+        <item>24h</item>
+    </string-array>
+</resources>

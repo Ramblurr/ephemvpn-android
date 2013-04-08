@@ -1,0 +1,33 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    
+        <EditTextPreference
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_aws_api"
+        android:summary="@string/pref_aws_api_sum" />
+        
+        <EditTextPreference
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_aws_secret"
+        android:summary="@string/pref_aws_secret_sum" />
+        
+        <EditTextPreference
+        android:maxLines="1"
+        android:summary="@string/pref_aws_key_file_sum"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_aws_key_file" />
+        
+        <ListPreference
+        android:dialogTitle="@string/pref_running_time"
+        android:summary="@string/pref_running_time_sum"        
+        android:title="@string/pref_running_time"
+        android:entries="@array/array_times"
+        android:entryValues="@array/array_times_values"
+        android:defaultValue="@array/empty_array"
+        />
+
+</PreferenceScreen>

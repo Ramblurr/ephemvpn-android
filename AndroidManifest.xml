@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.binaryelysium.ephemvpn"
+    android:installLocation="internalOnly"
+    android:versionCode="1"
+    android:versionName="1.0" >
 
-<manifest 	package="com.binaryelysium.ephemvpn"
-  			android:versionCode="1"
-  			android:versionName="1.0"
-  			android:installLocation="internalOnly"
-  			xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-sdk android:minSdkVersion="15" />
 
-  <uses-sdk     android:minSdkVersion="15"/>
-
-  <application 	android:debuggable="true"
-   				android:icon="@drawable/ic_launcher"
-    			android:label="@string/app_name"
-                android:theme="@style/AppTheme"
-    			android:name="com.binaryelysium.ephemvpn.ScriptApplication">
-
-      <activity
+    <application
+        android:name="com.binaryelysium.ephemvpn.ScriptApplication"
+        android:debuggable="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
             android:name="com.binaryelysium.ephemvpn.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
@@ -23,53 +22,57 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    <activity 	android:name="com.binaryelysium.ephemvpn.ScriptActivity"
-      			android:configChanges="keyboardHidden|orientation"
-      			android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        <activity
+            android:name="com.binaryelysium.ephemvpn.ScriptActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:parentActivityName="com.binaryelysium.ephemvpn.MainActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.binaryelysium.ephemvpn.MainActivity" />
 
-       <intent-filter>
-        <action		android:name="com.googlecode.android_scripting.action.ACTION_LAUNCH_FOR_RESULT" />
-        <category	android:name="android.intent.category.DEFAULT" />
-      </intent-filter>
+            <intent-filter>
+                <action android:name="com.googlecode.android_scripting.action.ACTION_LAUNCH_FOR_RESULT" />
 
-    </activity>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
-    <service 	android:name="ScriptService">
-    	<intent-filter>
-			<action android:name="com.binaryelysium.ephemvpn.ScriptService" />
-		</intent-filter>
-	</service>
+        <service android:name="com.binaryelysium.ephemvpn.ScriptService">
+            <intent-filter>
+                <action android:name="com.binaryelysium.ephemvpn.ScriptService" />
+            </intent-filter>
+        </service>
+        <service android:name="com.binaryelysium.ephemvpn.BackgroundScriptService" >
+            <intent-filter>
+                <action android:name="com.binaryelysium.ephemvpn.BackgroundScriptService" />
+            </intent-filter>
+        </service>
+        <service android:name="com.binaryelysium.ephemvpn.RpcServerService" />
 
-    <service 	android:name="BackgroundScriptService">
-    	<intent-filter>
-			<action android:name="com.binaryelysium.ephemvpn.BackgroundScriptService" />
-		</intent-filter>
-	</service>
+        <activity
+            android:name="com.googlecode.android_scripting.activity.FutureActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@android:style/Theme.Translucent" />
+        <activity
+            android:name="com.binaryelysium.ephemvpn.DialogActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.binaryelysium.ephemvpn.RpcServerLauncher"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
-	<service android:name="com.binaryelysium.ephemvpn.RpcServerService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
 
-    <activity 	android:configChanges="keyboardHidden|orientation"
-      			android:name="com.googlecode.android_scripting.activity.FutureActivity"
-      			android:theme="@android:style/Theme.Translucent"/>
+    <supports-screens android:xlargeScreens="true" />
 
-    <activity 	android:theme="@android:style/Theme.Translucent.NoTitleBar"
-      			android:configChanges="keyboardHidden|orientation"
-      			android:name="com.binaryelysium.ephemvpn.DialogActivity"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-	<activity
-     		android:name="com.binaryelysium.ephemvpn.RpcServerLauncher"
-     		android:taskAffinity=""
-     		android:theme="@android:style/Theme.Translucent.NoTitleBar">
-     		<intent-filter>
-       		<action android:name="android.intent.action.VIEW" />
-       		<category android:name="android.intent.category.DEFAULT" />
-     		</intent-filter>
-   	</activity>
-
-</application>
-
-  <supports-screens android:xlargeScreens="true" />
-
-  <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 </manifest>
