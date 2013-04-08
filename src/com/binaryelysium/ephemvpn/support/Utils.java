@@ -20,12 +20,12 @@
  * Original from SL4A modified to allow to embed Interpreter and scripts into an APK
  */
 
-package com.android.python27.support;
+package com.binaryelysium.ephemvpn.support;
 
 import android.os.Environment;
 import android.util.Log;
 
-import com.android.python27.config.GlobalConstants;
+import com.binaryelysium.ephemvpn.config.GlobalConstants;
 import com.googlecode.android_scripting.FileUtils;
 
 import java.io.BufferedInputStream;

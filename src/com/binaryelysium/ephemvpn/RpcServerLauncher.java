@@ -1,4 +1,4 @@
-package com.android.python27;
+package com.binaryelysium.ephemvpn;
 
 import android.app.Activity;
 import android.content.ComponentName;

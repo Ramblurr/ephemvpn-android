@@ -20,7 +20,7 @@
  * Original from SL4A modified to allow to embed Interpreter and scripts into an APK
  */
 
-package com.android.python27.config;
+package com.binaryelysium.ephemvpn.config;
 
 public class GlobalConstants {
 
@@ -30,5 +30,5 @@ public class GlobalConstants {
 	public static final String PYTHON_EXTRAS_ZIP_NAME = "python_extras_27.zip";
 
 	public static final boolean IS_FOREGROUND_SERVICE = false;
-	public static final String LOG_TAG = "PythonAPK";
+	public static final String LOG_TAG = "EPHEMVPN";
 }

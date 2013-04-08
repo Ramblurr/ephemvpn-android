@@ -20,7 +20,7 @@
  * Original from SL4A modified to allow to embed Interpreter and scripts into an APK
  */
 
-package com.android.python27.process;
+package com.binaryelysium.ephemvpn.process;
 
 import android.util.Log;
 

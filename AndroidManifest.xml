@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<manifest 	package="com.android.python27"
+<manifest 	package="com.binaryelysium.ephemvpn"
   			android:versionCode="1"
   			android:versionName="1.0"
   			android:installLocation="internalOnly"
@@ -11,9 +11,9 @@
   <application 	android:debuggable="true"
    				android:icon="@drawable/icon"
     			android:label="@string/app_name"
-    			android:name="com.android.python27.ScriptApplication">
+    			android:name="com.binaryelysium.ephemvpn.ScriptApplication">
         
-    <activity 	android:name=".ScriptActivity"
+    <activity 	android:name="com.binaryelysium.ephemvpn.ScriptActivity"
       			android:configChanges="keyboardHidden|orientation"
       			android:theme="@android:style/Theme.Translucent.NoTitleBar">
       
@@ -31,17 +31,17 @@
     
     <service 	android:name="ScriptService">
     	<intent-filter>
-			<action android:name="com.android.python27.ScriptService" />
+			<action android:name="com.binaryelysium.ephemvpn.ScriptService" />
 		</intent-filter>
 	</service>
 	
     <service 	android:name="BackgroundScriptService">
     	<intent-filter>
-			<action android:name="com.android.python27.BackgroundScriptService" />
+			<action android:name="com.binaryelysium.ephemvpn.BackgroundScriptService" />
 		</intent-filter>
 	</service>
 	
-	<service android:name=".RpcServerService" />
+	<service android:name="com.binaryelysium.ephemvpn.RpcServerService" />
 	        
     <activity 	android:configChanges="keyboardHidden|orientation"
       			android:name="com.googlecode.android_scripting.activity.FutureActivity" 
@@ -49,10 +49,10 @@
     
     <activity 	android:theme="@android:style/Theme.Translucent.NoTitleBar" 
       			android:configChanges="keyboardHidden|orientation" 
-      			android:name="com.android.python27.DialogActivity"/>
+      			android:name="com.binaryelysium.ephemvpn.DialogActivity"/>
 
 	<activity
-     		android:name=".RpcServerLauncher"
+     		android:name="com.binaryelysium.ephemvpn.RpcServerLauncher"
      		android:taskAffinity=""
      		android:theme="@android:style/Theme.Translucent.NoTitleBar">
      		<intent-filter>

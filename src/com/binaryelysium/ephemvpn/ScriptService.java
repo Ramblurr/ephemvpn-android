@@ -20,21 +20,31 @@
  * Original from SL4A modified to allow to embed Interpreter and scripts into an APK
  */
 
-package com.android.python27;
+package com.binaryelysium.ephemvpn;
 
-import android.app.Service;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
-import com.android.python27.config.GlobalConstants;
-import com.android.python27.process.MyScriptProcess;
+import com.binaryelysium.ephemvpn.config.GlobalConstants;
+import com.binaryelysium.ephemvpn.process.MyScriptProcess;
 import com.googlecode.android_scripting.AndroidProxy;
+import com.googlecode.android_scripting.Constants;
+import com.googlecode.android_scripting.FeaturedInterpreters;
+import com.googlecode.android_scripting.ForegroundService;
+import com.googlecode.android_scripting.NotificationIdFactory;
+import com.googlecode.android_scripting.interpreter.Interpreter;
 import com.googlecode.android_scripting.jsonrpc.RpcReceiverManager;
 import com.googlecode.android_scripting.interpreter.InterpreterConfiguration;
+import com.googlecode.android_scripting.BaseApplication;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,12 +52,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-public class BackgroundScriptService extends Service {
+public class ScriptService extends ForegroundService {
+	private final static int NOTIFICATION_ID = NotificationIdFactory.create();
 	private final CountDownLatch mLatch = new CountDownLatch(1);
-	private IBinder mBinder;
+	private final IBinder mBinder;
 	private MyScriptProcess myScriptProcess;
 	
-	private static BackgroundScriptService instance;
+	private static ScriptService instance;
 	private boolean killMe;
 	  
 	private InterpreterConfiguration mInterpreterConfiguration = null;
@@ -62,8 +73,8 @@ public class BackgroundScriptService extends Service {
     // ------------------------------------------------------------------------------------------------------
 
 	public class LocalBinder extends Binder {
-		public BackgroundScriptService getService() {
-			return BackgroundScriptService.this;
+		public ScriptService getService() {
+			return ScriptService.this;
 		}
 	}
 
@@ -76,9 +87,10 @@ public class BackgroundScriptService extends Service {
 
     // ------------------------------------------------------------------------------------------------------
 
-//	public BackgroundScriptService() {
-//		mBinder = new LocalBinder();
-//	}
+	public ScriptService() {
+		super(NOTIFICATION_ID);
+		mBinder = new LocalBinder();
+	}
 
     // ------------------------------------------------------------------------------------------------------
 
@@ -90,7 +102,7 @@ public class BackgroundScriptService extends Service {
     // ------------------------------------------------------------------------------------------------------
 
     public static Context getAppContext() {
-        return BackgroundScriptService.context;
+        return ScriptService.context;
     }
     
     // ------------------------------------------------------------------------------------------------------
@@ -98,8 +110,7 @@ public class BackgroundScriptService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		BackgroundScriptService.context = getApplicationContext();
-		mBinder = new LocalBinder();
+		ScriptService.context = getApplicationContext();
 	}
 
     // ------------------------------------------------------------------------------------------------------
@@ -182,10 +193,8 @@ public class BackgroundScriptService extends Service {
 		myScriptProcess = MyScriptProcess.launchScript(script, mInterpreterConfiguration, mProxy, new Runnable() {
 					@Override
 					public void run() {
-						mProxy.shutdown();
-						stopSelf(startId);
-						killProcess();
-						android.os.Process.killProcess(android.os.Process.myPid());
+						//mProxy.shutdown();
+						//stopSelf(startId);
 						
 						// hard force restart
 //				        if (!ScriptService.this.killMe) {
@@ -209,4 +218,17 @@ public class BackgroundScriptService extends Service {
 	}
 
     // ------------------------------------------------------------------------------------------------------
+
+	@Override
+	protected Notification createNotification() {
+	    Notification notification =
+	        new Notification(R.drawable.icon, this.getString(R.string.loading), System.currentTimeMillis());
+	    // This contentIntent is a noop.
+	    PendingIntent contentIntent = PendingIntent.getService(this, 0, new Intent(), 0);
+	    notification.setLatestEventInfo(this, this.getString(R.string.app_name), this.getString(R.string.loading), contentIntent);
+	    notification.flags = Notification.FLAG_AUTO_CANCEL;
+		return notification;
+	}
+
+	
 }

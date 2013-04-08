@@ -20,7 +20,7 @@
  * Original from SL4A modified to allow to embed Interpreter and scripts into an APK
  */
 
-package com.android.python27;
+package com.binaryelysium.ephemvpn;
 
 import android.content.Context;
 
