@@ -1,0 +1,3 @@
+[submodule "external/ephemvpn"]
+	path = external/ephemvpn
+	url = git://github.com/Ramblurr/ephemvpn.git
