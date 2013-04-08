@@ -1,6 +1,8 @@
 
 package com.binaryelysium.ephemvpn;
 
+import com.googlecode.android_scripting.AndroidProxy;
+
 import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Intent;
@@ -8,8 +10,6 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-
-import com.googlecode.android_scripting.AndroidProxy;
 
 public class RpcServerService extends Service {
     private final IBinder mBinder;
@@ -39,7 +39,8 @@ public class RpcServerService extends Service {
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
 
-        if (intent.getAction().equals("com.android.python27.LAUNCH_RPC_SERVER")) {
+        if(intent == null) return;
+        if (intent.getAction().equals("com.binaryelysium.ephemvpn.LAUNCH_RPC_SERVER")) {
             LaunchServerAsyncTask ll = new LaunchServerAsyncTask(intent);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
                 ll.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
@@ -90,7 +91,7 @@ public class RpcServerService extends Service {
 
         AndroidProxy androidProxy = new AndroidProxy(this, intent, requiresHandshake);
         boolean usePublicIp = false;
-        int usePort = intent.getIntExtra("com.android.python27.RPC_SERVER_PORT", 0);
+        int usePort = intent.getIntExtra("com.binaryelysium.ephemvpn.RPC_SERVER_PORT", 0);
 
         // If port is in use, fall back to defaut behaviour
         if (!tryPort(androidProxy, usePublicIp, usePort)) {
