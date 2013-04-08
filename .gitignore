@@ -55,3 +55,7 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+external/ephemvpn-extras/
+external/ephemvpn_bundle.zip
+external/virtenv/
