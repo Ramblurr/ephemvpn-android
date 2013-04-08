@@ -25,6 +25,7 @@ package com.binaryelysium.ephemvpn.process;
 import android.os.Environment;
 
 import com.binaryelysium.ephemvpn.ScriptApplication;
+import com.googlecode.android_scripting.Analytics;
 import com.googlecode.android_scripting.AndroidProxy;
 import com.googlecode.android_scripting.interpreter.Interpreter;
 import com.googlecode.android_scripting.interpreter.InterpreterConstants;
@@ -46,15 +47,15 @@ public class InterpreterProcess extends Process {
 
     private String pyname = "python";
 
-    private final File binary = null;
+    private File binary = null;
 
-    private final String niceName;
+    private String niceName;
 
-    private final String interactiveCommand;
+    private String interactiveCommand;
 
-    private final List<String> arguments;
+    private List<String> arguments;
 
-    private final Map<String, String> environmentVariables = null;
+    private Map<String, String> environmentVariables = null;
 
     /**
      * Creates a new {@link InterpreterProcess}.
@@ -133,6 +134,7 @@ public class InterpreterProcess extends Process {
     public void start(Runnable paramRunnable, List<String> paramList) {
         String[] arrayOfString = new String[1];
         arrayOfString[0] = pyname;
+        Analytics.track(arrayOfString);
         if (!this.mCommand.equals(""))
             addArgument(this.mCommand);
         if (paramList != null)
