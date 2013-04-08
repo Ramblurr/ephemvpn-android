@@ -143,7 +143,7 @@ ActionBar.TabListener {
                 case 0:
                     return getString(R.string.title_settings).toUpperCase(l);
                 case 1:
-                    return "Something";
+                    return getString(R.string.title_summon).toUpperCase(l);
             }
             return null;
         }
@@ -166,12 +166,10 @@ ActionBar.TabListener {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main,
+            View rootView = inflater.inflate(R.layout.fragment_start,
                     container, false);
             TextView dummyTextView = (TextView) rootView
-                    .findViewById(R.id.section_label);
-            dummyTextView.setText(Integer.toString(getArguments().getInt(
-                    ARG_SECTION_NUMBER)));
+                    .findViewById(R.id.vpn_user);
             return rootView;
         }
     }

@@ -6,6 +6,7 @@
     <string name="hello_world">Hello world!</string>
     
     <string name="title_settings">Settings</string>
+    <string name="title_summon">Summon</string>
     
     <string name="pref_aws_api">AWS API Key</string>
     <string name="pref_aws_api_sum">Your API key from AWS</string>
